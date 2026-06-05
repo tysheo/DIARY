@@ -7,6 +7,7 @@ import * as THREE from 'three';
 import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
+import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
 import { POST, PALETTE } from './config';
 
 // ── Painterly / Halftone shader ──────────────────────────────
@@ -196,6 +197,16 @@ export function createPostProcessing(
   const renderPass = new RenderPass(scene, camera);
   composer.addPass(renderPass);
 
+  // 1.5. Unreal Bloom Pass
+  // Vector2(resolutionX, resolutionY), strength, radius, threshold
+  const bloomPass = new UnrealBloomPass(
+    new THREE.Vector2(width, height),
+    0.6,   // Initial strength (low for subtle ethereal glow)
+    0.8,   // Radius
+    0.85   // Threshold - only bloom very bright elements (prevents diary page from blinding)
+  );
+  composer.addPass(bloomPass);
+
   // 2. Painterly halftone pass
   const halftonePass = new ShaderPass(PainterlyHalftoneShader);
   composer.addPass(halftonePass);
@@ -228,6 +239,9 @@ export function createPostProcessing(
 
     // Halftone becomes more pronounced
     halftonePass.uniforms.uIntensity.value = 0.5 + t * 0.4;
+    
+    // Bloom strength increases slightly with tension
+    bloomPass.strength = 0.6 + t * 0.8;
   }
 
   /**
@@ -236,6 +250,7 @@ export function createPostProcessing(
   function resize(w: number, h: number): void {
     composer.setSize(w, h);
     finalPass.uniforms.uResolution.value.set(w, h);
+    bloomPass.resolution.set(w, h);
   }
 
   /**

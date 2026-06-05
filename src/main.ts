@@ -371,6 +371,10 @@ function animate(now: number): void {
   const tearDropPos = silhouette.update(elapsed, deltaTime);
   inkSystem.update(elapsed, deltaTime);
 
+  // Parallax depth effect
+  camera.position.x += (mouseNDC.x * 0.5 - camera.position.x) * 0.05;
+  camera.position.y += (mouseNDC.y * 0.5 - camera.position.y) * 0.05;
+
   const bleedPositions = diaryPage.consumeBleedParticles();
   if (bleedPositions.length > 0) {
     inkSystem.spawnDroplets(bleedPositions);

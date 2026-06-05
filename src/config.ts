@@ -77,7 +77,7 @@ export const LAYOUT = {
   eyeWidth: 1.95,
   eyeHeight: 1.42,
   eyeSpacing: 2.35,
-  eyeY: 2.18,
+  eyeY: 4.17,
   eyeZ: -1.5,
   irisRadius: 0.34,
 

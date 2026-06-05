@@ -287,6 +287,7 @@ export class InkSystem {
 
     this.particleMesh = new THREE.Points(this.geometry, material);
     this.particleMesh.frustumCulled = false;
+    this.particleMesh.renderOrder = 2; // In front of diary
 
     // ── Initialise pool ──
     const poolTexture = createPoolTexture();

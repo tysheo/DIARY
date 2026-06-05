@@ -485,9 +485,9 @@ function createTearCanvas(): HTMLCanvasElement {
 
   // Fill with tear grey-blue
   const grad = ctx.createLinearGradient(0, 6, 0, 60);
-  grad.addColorStop(0, '#D0DDE0');
-  grad.addColorStop(0.5, PALETTE_CSS.tearGrey);
-  grad.addColorStop(1, '#B8C8CC');
+  grad.addColorStop(0, '#FFFFFF');
+  grad.addColorStop(0.5, '#E0FFFF');
+  grad.addColorStop(1, '#FFFFFF');
   ctx.fillStyle = grad;
   ctx.fill();
 
@@ -517,10 +517,10 @@ function createTearTrailCanvas(): HTMLCanvasElement {
   ctx.clearRect(0, 0, W, H);
 
   const grad = ctx.createLinearGradient(0, 0, 0, H);
-  grad.addColorStop(0, 'rgba(200, 212, 216, 0)');
-  grad.addColorStop(0.28, 'rgba(200, 212, 216, 0.28)');
-  grad.addColorStop(0.68, 'rgba(90, 7, 18, 0.22)');
-  grad.addColorStop(1, 'rgba(90, 7, 18, 0)');
+  grad.addColorStop(0, 'rgba(255, 255, 255, 0)');
+  grad.addColorStop(0.28, 'rgba(255, 255, 255, 0.6)');
+  grad.addColorStop(0.68, 'rgba(255, 200, 200, 0.4)');
+  grad.addColorStop(1, 'rgba(255, 100, 100, 0)');
 
   ctx.strokeStyle = grad;
   ctx.lineWidth = 7;
@@ -618,7 +618,7 @@ export class Silhouette {
     );
     this.silhouetteMesh = new THREE.Mesh(silhouetteGeo, this.silhouetteMat);
     this.silhouetteMesh.position.set(0, LAYOUT.silhouetteY, LAYOUT.silhouetteZ);
-    this.silhouetteMesh.renderOrder = -1;
+    this.silhouetteMesh.renderOrder = -2;
     this.group.add(this.silhouetteMesh);
 
     const socketCanvas = createEyeSocketCanvas();
@@ -644,7 +644,7 @@ export class Silhouette {
       LAYOUT.eyeY - 0.03,
       LAYOUT.eyeZ - 0.03,
     );
-    this.leftSocketMesh.renderOrder = 0;
+    this.leftSocketMesh.renderOrder = -2;
     this.group.add(this.leftSocketMesh);
 
     this.rightSocketMat = new THREE.MeshBasicMaterial({
@@ -661,7 +661,7 @@ export class Silhouette {
       LAYOUT.eyeY - 0.03,
       LAYOUT.eyeZ - 0.03,
     );
-    this.rightSocketMesh.renderOrder = 0;
+    this.rightSocketMesh.renderOrder = -2;
     this.group.add(this.rightSocketMesh);
 
     // ─── Eyes ──────────────────────────────────────────────────
@@ -688,7 +688,7 @@ export class Silhouette {
       LAYOUT.eyeZ,
     );
     this.leftEyeMesh.scale.y = 0; // closed
-    this.leftEyeMesh.renderOrder = 1;
+    this.leftEyeMesh.renderOrder = -2;
     this.group.add(this.leftEyeMesh);
 
     // Right eye
@@ -707,7 +707,7 @@ export class Silhouette {
       LAYOUT.eyeZ,
     );
     this.rightEyeMesh.scale.y = 0; // closed
-    this.rightEyeMesh.renderOrder = 1;
+    this.rightEyeMesh.renderOrder = -2;
     this.group.add(this.rightEyeMesh);
 
     // ─── Irises ────────────────────────────────────────────────
@@ -729,7 +729,7 @@ export class Silhouette {
     });
     this.leftIrisMesh = new THREE.Mesh(irisGeo, this.leftIrisMat);
     this.leftIrisMesh.position.set(0, -0.15, 0.01); // looking down
-    this.leftIrisMesh.renderOrder = 2;
+    this.leftIrisMesh.renderOrder = -2;
     this.leftEyeMesh.add(this.leftIrisMesh);
 
     this.rightIrisMat = new THREE.MeshBasicMaterial({
@@ -742,7 +742,7 @@ export class Silhouette {
     });
     this.rightIrisMesh = new THREE.Mesh(irisGeo, this.rightIrisMat);
     this.rightIrisMesh.position.set(0, -0.15, 0.01); // looking down
-    this.rightIrisMesh.renderOrder = 2;
+    this.rightIrisMesh.renderOrder = -2;
     this.rightEyeMesh.add(this.rightIrisMesh);
 
     // ─── Tear ──────────────────────────────────────────────────
@@ -761,7 +761,7 @@ export class Silhouette {
       opacity: 0,
     });
     this.tearMesh = new THREE.Mesh(tearGeo, this.tearMat);
-    this.tearMesh.renderOrder = 2;
+    this.tearMesh.renderOrder = -2;
     // Start as child of the right eye, at bottom edge
     this.tearMesh.position.set(0, -LAYOUT.eyeHeight / 2 + 0.05, 0.02);
     this.rightEyeMesh.add(this.tearMesh);
@@ -780,7 +780,7 @@ export class Silhouette {
       opacity: 0,
     });
     this.tearTrailMesh = new THREE.Mesh(trailGeo, this.tearTrailMat);
-    this.tearTrailMesh.renderOrder = 2;
+    this.tearTrailMesh.renderOrder = -2;
     this.tearTrailMesh.position.set(0, 0, 0);
     this.group.add(this.tearTrailMesh);
   }
@@ -1039,6 +1039,7 @@ export class Silhouette {
         this.tearMesh.getWorldPosition(this.tearWorldPos);
         this.rightEyeMesh.remove(this.tearMesh);
         this.tearMesh.position.copy(this.tearWorldPos);
+        this.group.worldToLocal(this.tearMesh.position);
         this.group.add(this.tearMesh);
         this.tearDetached = true;
         this.tearStartTime = elapsed; // re-use for fall timing
